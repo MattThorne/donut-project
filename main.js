@@ -14,9 +14,16 @@ var zprime = 400;
 var lightSource = [1,-1,0]
 var magLightSource = Math.sqrt(lightSource[0]**2 + lightSource[1]**2 + lightSource[2]**2);
 var autoRotate = false;
+var pointStyle = true;
 
+function toggleRotationControl() {
+    autoRotate = !autoRotate;
+}
+function togglePointStyle() {
+    pointStyle = !pointStyle;
+}
 
-
+var Cords;
 var active = false;
 var startX;
 var endX;
@@ -46,7 +53,7 @@ document.addEventListener("mousemove", function( event ) {
     centerX += dx;
     centerY += dy;
     }
-    if(active == true && shiftActive == true){
+    if(active == true && shiftActive == true && autoRotate == false){
         b += -dx;
         c += dy;
     }
@@ -195,22 +202,20 @@ function animate() {
         for (z=-20;z<30;z+= 5){
         thetaRad = theta * Math.PI / 180;
         //var Cords = circleCoords(radius, thetaRad);
-        var Cords = cylinderCoords(radius,thetaRad,z);
+        Cords = cylinderCoords(radius,thetaRad,z);
         Cords = rotateCoords(Cords,aRad,bRad,cRad);
         Cords = projectionCoords(Cords);
         Cords = [Math.round(Cords[0]),Math.round(Cords[1]),Math.round(Cords[2]),Cords[3],Cords[4],Cords[5]]
-        var luminationSymbol = luminenceCalc([Cords[3],Cords[4],Cords[5]]);
         try{
         if (1/Cords[2] > zbuffer[Cords[0]][Cords[1]]){
             zbuffer[Cords[0]][Cords[1]] = 1/Cords[2];
-            ctx.fillText(luminationSymbol, Cords[0], Cords[1]);
-            //ctx.fillText('.', Cords[0], Cords[1]);
-        }
-    }catch(err){
-        console.log(err.message);
-
-    }
-    }
+            if (pointStyle == true){
+                var luminationSymbol = luminenceCalc([Cords[3],Cords[4],Cords[5]]);
+                ctx.fillText(luminationSymbol, Cords[0], Cords[1]);
+            }else{ctx.fillText('.', Cords[0], Cords[1]);}
+            }
+        }catch(err){console.log(err.message);}
+    }   
     }
     
     //sleep(50);
